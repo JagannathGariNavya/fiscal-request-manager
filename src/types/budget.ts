@@ -1,4 +1,6 @@
 
+import { UserRole } from "./auth";
+
 export type BudgetStatus = 'active' | 'draft' | 'archived';
 export type RequestStatus = 'pending' | 'approved' | 'rejected';
 

@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { User, UserRole, AuthState } from "@/types/auth";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   // Check if user is already logged in from localStorage
-  useState(() => {
+  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("user");
       }
     }
-  });
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setState({ ...state, isLoading: true });

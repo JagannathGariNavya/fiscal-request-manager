@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,13 +33,9 @@ const formSchema = z.object({
 const Login = () => {
   const { login, isAuthenticated, isLoading } = useAuth();
   const [error, setError] = useState("");
-
-  // If already authenticated, redirect to dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  // Initialize form
+  const navigate = useNavigate();
+  
+  // Initialize form - this must be called regardless of authentication state
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,11 +51,18 @@ const Login = () => {
       const success = await login(data.email, data.password);
       if (!success) {
         setError("Invalid email or password");
+      } else {
+        navigate("/dashboard");
       }
     } catch (err) {
       setError("An error occurred during login");
     }
   };
+
+  // Render redirect if authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
