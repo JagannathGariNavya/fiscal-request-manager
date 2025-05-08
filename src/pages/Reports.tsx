@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, FileExcel, Download } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 
 // Mock data
 import { departments } from "@/data/mockData";
@@ -97,7 +97,7 @@ const Reports = () => {
                   onClick={() => downloadReport("excel")}
                   className="w-full bg-green-600 hover:bg-green-700"
                 >
-                  <FileExcel className="mr-2 h-4 w-4" />
+                  <FileText className="mr-2 h-4 w-4" />
                   Download Excel
                 </Button>
               </div>
