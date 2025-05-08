@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,22 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				finance: {
+					DEFAULT: '#1e40af', // blue-800
+					light: '#bfdbfe', // blue-200
+				},
+				hod: {
+					DEFAULT: '#047857', // emerald-700
+					light: '#a7f3d0', // emerald-200
+				},
+				clerk: {
+					DEFAULT: '#7c3aed', // violet-600
+					light: '#ddd6fe', // violet-200
+				},
+				approved: '#059669', // emerald-600
+				rejected: '#dc2626', // red-600
+				pending: '#d97706', // amber-600
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
