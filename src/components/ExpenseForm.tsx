@@ -24,14 +24,12 @@ import {
 
 // Mock data for demonstration
 import { expenditureRequests } from "@/data/mockData";
+import { ExpenditureRequest } from "@/types/budget";
 
 // Form schema
 const formSchema = z.object({
   requestId: z.string({
     required_error: "Please select an approved request",
-  }),
-  referenceNumber: z.string().min(3, {
-    message: "Reference number must be at least 3 characters",
   }),
   amount: z.number({
     required_error: "Amount is required",
@@ -46,15 +44,11 @@ const formSchema = z.object({
 
 interface ExpenseFormProps {
   onSubmit: (data: z.infer<typeof formSchema>) => void;
+  requests: ExpenditureRequest[];
 }
 
-const ExpenseForm = ({ onSubmit }: ExpenseFormProps) => {
+const ExpenseForm = ({ onSubmit, requests = [] }: ExpenseFormProps) => {
   const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
-
-  // Filter for approved requests only
-  const approvedRequests = expenditureRequests.filter(
-    (req) => req.status === "approved"
-  );
 
   // Initialize form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,6 +66,11 @@ const ExpenseForm = ({ onSubmit }: ExpenseFormProps) => {
     onSubmit(data);
     form.reset();
   };
+
+  // Find the selected request to display details
+  const selectedRequestDetails = selectedRequest 
+    ? requests.find(req => req.id === selectedRequest)
+    : null;
 
   return (
     <Form {...form}>
@@ -95,7 +94,7 @@ const ExpenseForm = ({ onSubmit }: ExpenseFormProps) => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {approvedRequests.map((request) => (
+                  {requests.map((request) => (
                     <SelectItem key={request.id} value={request.id}>
                       ID: {request.id.slice(0, 8)} - Amount: ₹{request.approvedAmount}
                     </SelectItem>
@@ -107,19 +106,12 @@ const ExpenseForm = ({ onSubmit }: ExpenseFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="referenceNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Reference Number</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter reference number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {selectedRequestDetails && (
+          <div className="p-3 bg-blue-50 rounded-md">
+            <p className="text-sm font-medium">Request Reference: {selectedRequestDetails.referenceNumber || 'N/A'}</p>
+            <p className="text-sm">Approved Amount: ₹{selectedRequestDetails.approvedAmount}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <FormField

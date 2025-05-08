@@ -5,7 +5,7 @@ import AppLayout from "@/components/layout/AppLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,7 @@ const Reports = () => {
   const { user } = useAuth();
   const [selectedDepartment, setSelectedDepartment] = useState<string>("");
   const [reportType, setReportType] = useState<string>("budgets");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Handle report download
   const downloadReport = (format: "pdf" | "excel") => {
@@ -35,19 +36,141 @@ const Reports = () => {
       return;
     }
 
-    // In a real app, this would call an API to generate and download the report
+    setIsGenerating(true);
+    
+    // Toast notification
     toast({
-      title: "Report downloading",
+      title: "Report generating",
       description: `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} report for the selected department is being prepared in ${format.toUpperCase()} format.`,
     });
 
-    // Simulate download delay
+    // Simulate report generation
     setTimeout(() => {
+      setIsGenerating(false);
+      
+      // Create mock data for the report
+      const mockData = generateMockReportData(reportType, selectedDepartment);
+      
+      // Generate the report file
+      if (format === "pdf") {
+        generatePDF(mockData, reportType, selectedDepartment);
+      } else {
+        generateExcel(mockData, reportType, selectedDepartment);
+      }
+      
       toast({
         title: "Download complete",
         description: "Your report has been downloaded successfully.",
       });
-    }, 2000);
+    }, 1500);
+  };
+
+  // Generate mock data for the report
+  const generateMockReportData = (type: string, departmentId: string) => {
+    // This would typically come from an API in a real application
+    const departmentName = departments.find(d => d.id === departmentId)?.name || "Unknown";
+    
+    // Generate different mock data based on report type
+    switch (type) {
+      case "budgets":
+        return {
+          department: departmentName,
+          date: new Date().toLocaleDateString(),
+          budgets: [
+            { head: "Salaries", allocated: 500000, spent: 350000, remaining: 150000 },
+            { head: "Infrastructure", allocated: 200000, spent: 75000, remaining: 125000 },
+            { head: "Operations", allocated: 150000, spent: 120000, remaining: 30000 },
+          ]
+        };
+      case "requests":
+        return {
+          department: departmentName,
+          date: new Date().toLocaleDateString(),
+          requests: [
+            { id: "REQ001", purpose: "Office Equipment", requested: 50000, approved: 45000, status: "Approved" },
+            { id: "REQ002", purpose: "Travel Expenses", requested: 25000, approved: 25000, status: "Approved" },
+            { id: "REQ003", purpose: "Software Subscription", requested: 15000, approved: 0, status: "Rejected" },
+          ]
+        };
+      case "expenses":
+        return {
+          department: departmentName,
+          date: new Date().toLocaleDateString(),
+          expenses: [
+            { ref: "EXP001", request: "REQ001", amount: 30000, date: "2023-05-01", installment: "1 of 2" },
+            { ref: "EXP002", request: "REQ001", amount: 15000, date: "2023-05-15", installment: "2 of 2" },
+            { ref: "EXP003", request: "REQ002", amount: 25000, date: "2023-05-10", installment: "1 of 1" },
+          ]
+        };
+      default:
+        return { department: departmentName, date: new Date().toLocaleDateString() };
+    }
+  };
+
+  // Generate PDF report
+  const generatePDF = (data: any, type: string, departmentId: string) => {
+    // In a real app, this would generate a PDF file
+    // For now, we'll create a text blob with JSON data to simulate the download
+    const departmentName = departments.find(d => d.id === departmentId)?.name || "Unknown";
+    const fileName = `${type}-report-${departmentName.toLowerCase().replace(/\s+/g, '-')}.pdf`;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/pdf' });
+    
+    // Create download link and trigger click
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  };
+
+  // Generate Excel report
+  const generateExcel = (data: any, type: string, departmentId: string) => {
+    // In a real app, this would generate an Excel file
+    // For now, we'll create a text blob with CSV data to simulate the download
+    const departmentName = departments.find(d => d.id === departmentId)?.name || "Unknown";
+    const fileName = `${type}-report-${departmentName.toLowerCase().replace(/\s+/g, '-')}.csv`;
+    
+    // Convert data to CSV format
+    let csvContent = "";
+    
+    // Add headers and content based on report type
+    if (type === "budgets" && data.budgets) {
+      csvContent = "Budget Head,Allocated Amount,Spent Amount,Remaining Amount\n";
+      data.budgets.forEach((item: any) => {
+        csvContent += `${item.head},${item.allocated},${item.spent},${item.remaining}\n`;
+      });
+    } else if (type === "requests" && data.requests) {
+      csvContent = "Request ID,Purpose,Requested Amount,Approved Amount,Status\n";
+      data.requests.forEach((item: any) => {
+        csvContent += `${item.id},${item.purpose},${item.requested},${item.approved},${item.status}\n`;
+      });
+    } else if (type === "expenses" && data.expenses) {
+      csvContent = "Reference,Request ID,Amount,Date,Installment\n";
+      data.expenses.forEach((item: any) => {
+        csvContent += `${item.ref},${item.request},${item.amount},${item.date},${item.installment}\n`;
+      });
+    } else {
+      csvContent = "No data available";
+    }
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    
+    // Create download link and trigger click
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   };
 
   return (
@@ -89,6 +212,7 @@ const Reports = () => {
                 <Button
                   onClick={() => downloadReport("pdf")}
                   className="w-full mb-2 bg-red-600 hover:bg-red-700"
+                  disabled={isGenerating}
                 >
                   <FileText className="mr-2 h-4 w-4" />
                   Download PDF
@@ -96,6 +220,7 @@ const Reports = () => {
                 <Button
                   onClick={() => downloadReport("excel")}
                   className="w-full bg-green-600 hover:bg-green-700"
+                  disabled={isGenerating}
                 >
                   <FileText className="mr-2 h-4 w-4" />
                   Download Excel

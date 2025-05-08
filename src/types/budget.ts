@@ -2,7 +2,7 @@
 import { UserRole } from "./auth";
 
 export type BudgetStatus = 'active' | 'draft' | 'archived';
-export type RequestStatus = 'pending' | 'approved' | 'rejected';
+export type RequestStatus = 'pending' | 'approved' | 'rejected' | 'completed';
 export type ExpenseStatus = 'recorded' | 'verified' | 'rejected';
 
 export interface Department {
@@ -54,6 +54,7 @@ export interface ExpenditureRequest {
   approvedAmount: number;
   purpose: string;
   status: RequestStatus;
+  referenceNumber?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
