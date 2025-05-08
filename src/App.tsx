@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Budgets from "./pages/Budgets";
 import Requests from "./pages/Requests";
+import Expenses from "./pages/Expenses";
+import Reports from "./pages/Reports";
 import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +29,8 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/budgets" element={<Budgets />} />
             <Route path="/requests" element={<Requests />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/reports" element={<Reports />} />
             <Route path="/history" element={<History />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

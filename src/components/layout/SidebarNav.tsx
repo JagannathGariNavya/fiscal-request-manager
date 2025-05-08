@@ -25,6 +25,16 @@ const SidebarNav = () => {
       allowedRoles: ["hod", "clerk"],
     },
     {
+      title: "Expense Tracking",
+      href: "/expenses",
+      allowedRoles: ["clerk", "hod", "finance"],
+    },
+    {
+      title: "Reports",
+      href: "/reports",
+      allowedRoles: ["finance", "hod", "clerk"],
+    },
+    {
       title: "History",
       href: "/history",
       allowedRoles: ["finance", "hod", "clerk"],

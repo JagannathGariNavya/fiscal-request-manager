@@ -3,6 +3,7 @@ import { UserRole } from "./auth";
 
 export type BudgetStatus = 'active' | 'draft' | 'archived';
 export type RequestStatus = 'pending' | 'approved' | 'rejected';
+export type ExpenseStatus = 'recorded' | 'verified' | 'rejected';
 
 export interface Department {
   id: string;
@@ -53,6 +54,24 @@ export interface ExpenditureRequest {
   approvedAmount: number;
   purpose: string;
   status: RequestStatus;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Expense {
+  id: string;
+  requestId: string;
+  referenceNumber: string;
+  departmentId: string;
+  subDepartmentId: string;
+  budgetHeadId: string;
+  subBudgetHeadId: string;
+  amount: number;
+  installmentNumber: number;
+  totalInstallments: number;
+  recordedBy: string;
+  status: ExpenseStatus;
   notes?: string;
   createdAt: string;
   updatedAt: string;
